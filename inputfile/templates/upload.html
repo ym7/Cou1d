@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传文件</title>
+
+</head>
+<style>
+    input {
+        width: 200px;
+        height: 60px;
+    }
+    button {
+        background-color: yellow;
+        width: 400px;
+        height: 200px;
+        font-size: 60px;
+    }
+</style>
+<body>
+<div style="border: 30px; background-color:silver; color: red;">
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <h1>文件:</h1>
+        <input type="file" name="files" id="">
+    </div>
+    <p>
+        {{ msg }}
+        <button type="submit" style="text-align: center">上传</button>
+    </p>
+</form>
+</div>
+</body>
+</html>

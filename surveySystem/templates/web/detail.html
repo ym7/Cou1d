@@ -1,0 +1,87 @@
+{% extends 'web/public/layout.html' %}
+{% block app-page %}
+  <div class="survey-detail" id="{{ pk }}">
+    <div class="row">
+      <div class="col-xs-3">
+        <el-input v-model="uniqueCode" placeholder="请输入唯一码"></el-input>
+      </div>
+    </div>
+    <hr>
+    <el-form ref="form" :model="forms" label-width="80px" label-position="top">
+      <el-form-item v-for="(form, index) in forms" :label="form.name" :error="form.error">
+        <el-input v-if="form.answer_type == 'suggestion'" type="textarea" v-model="form.value"></el-input>
+        <el-radio-group v-model="form.value" v-if="form.answer_type == 'score'">
+          <el-radio v-for="(choice, index) in form.choices" :label="choice.points">
+            {% templatetag openvariable %}choice.content{% templatetag closevariable %}
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">创建问卷调查</el-button>
+        <el-button>取消</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+{% endblock %}
+{% block js %}
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        forms: [],
+        uniqueCode: "",
+      },
+      mounted() {
+        this.initFormData()
+      },
+      computed: {},
+      methods: {
+        initFormData() {
+          let vm = this;
+          let pk = $("div.survey-detail").prop("id");
+          axios.get(`/api/surveys/${pk}/`).then(function (resp) {
+            vm.forms = resp.data;
+          })
+        },
+        onSubmit() {
+          let data = this.getFormData();
+          let pk = $("div.survey-detail").prop("id");
+          let vm = this;
+          axios.post(
+            `/api/surveys/${pk}/`, {
+              "data": data,
+              "unique_code": this.uniqueCode,
+            }
+            ).then(function (resp) {
+            let res = resp.data;
+            if (res.errcode) {
+              alert("提交成功");
+              location.reload();
+            } else {
+              if (typeof(res.data) === "string") {
+                alert(res.data)
+              } else {
+                for (let i = 0; i < res.data.length; i++) {
+
+                  var errors = res.data[i].value;
+
+                  if (errors){
+                    vm.forms[i].error = res.data[i].value.toString();
+                  }else {
+                    vm.forms[i].error = ""
+                  }
+                }
+              }
+            }
+          })
+        },
+        getFormData() {
+          return this.forms
+        },
+        getError(form) {
+          return ""
+        }
+      }
+    })
+  </script>
+{% endblock %}

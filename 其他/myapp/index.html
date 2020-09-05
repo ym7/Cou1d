@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href="css/mui.css"/>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <h1 class="mui-title">首页</h1>
+    </header>
+    <div class="mui-content">
+      <ul class="mui-table-view" id="content_list">
+		
+      </ul>
+    </div>
+    <nav class="mui-bar mui-bar-tab">
+        <a class="mui-tab-item mui-active" id="home">
+            <span class="mui-icon mui-icon-home"></span>
+            <span class="mui-tab-label">首页</span>
+        </a>
+        <a class="mui-tab-item">
+            <span class="mui-icon mui-icon-phone"></span>
+            <span class="mui-tab-label">电话</span>
+        </a>
+        <a class="mui-tab-item" id="email">
+            <span class="mui-icon mui-icon-email"></span>
+            <span class="mui-tab-label">邮件</span>
+        </a>
+        <a class="mui-tab-item" id="setting">
+            <span class="mui-icon mui-icon-gear"></span>
+            <span class="mui-tab-label">设置</span>
+        </a>
+    </nav>
+    <script src="js/mui.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+    mui.init();
+    mui.plusReady(function () {
+		mui.post('http://192.168.13.144:9527/content_list',{
+				
+			},function(data){
+				for (var i = 0; i < data.length; i++) {
+//					console.log(JSON.stringify(data[i])) 
+					create_item(data[i]);
+				}
+			},'json' 
+		);
+    })
+    
+    document.getElementById('home').addEventListener('tap',function () {
+        mui.openWindow({
+    		"url":"index.html",
+    		"id":"index.html",
+        });
+    })
+    
+    document.getElementById("setting").addEventListener("tap",function(){
+    	mui.openWindow({
+    		"url":"login_my.html",
+    		"id":"login_my.html",
+    		styles:{
+    			top:"0px",
+    			bottom:"50px"
+    		},
+    		extras:{
+    			name:"666"
+    		}
+    	});
+    });
+    
+    document.getElementById('email').addEventListener('tap',function () {
+		var new_page = plus.webview.getWebviewById("new.html");
+		mui.fire(new_page,'show_alert',{name:"chunsheng"});
+    })
+    
+    document.addEventListener("show",function(data){
+    	console.log(data.detail.web);
+    })
+    
+    function create_item(content){         
+          var li = document.createElement("li");
+          li.className ="mui-table-view-cell mui-media";
+          var a = document.createElement("a");
+          var img = document.createElement("img");
+          img.className ="mui-media-object mui-pull-left";
+          img.src = "http://192.168.13.144:9527/get_image/"+content.image;
+          var div = document.createElement("div");
+          div.className="mui-media-body";
+          div.innerText = content.tilte;
+          var p = document.createElement("p");
+          p.className="mui-ellipsis";
+          p.innerText=content.text;
+          
+          li.appendChild(a);
+          a.appendChild(img);
+          a.appendChild(div);
+          div.appendChild(p);
+          
+          document.getElementById("content_list").appendChild(li);
+    }
+    
+
+    
+    </script>
+</body>
+</html>
